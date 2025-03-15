@@ -1,14 +1,21 @@
-import Link from "next/link";
+"use client";
 
-const NavLink = ({ href, title }) => {
-  return (
-    <Link
-      href={href}
-      className="block py-2 pl-3 pr-4 text-[#ADB7BE] sm:text-xl rounded md:p-0 hover:text-white"
-    >
-      {title}
-    </Link>
-  );
+import Link from "next/link";
+import React from "react";
+
+const NavLink = ({ href, title, isActive }) => {
+    return (
+        <Link
+            href={href}
+            className={`relative py-2 text-lg font-medium transition-all duration-300 ${
+                isActive
+                    ? "text-white"
+                    : "text-[#ADB7BE] hover:text-white"
+            }`}
+        >
+            {title}
+        </Link>
+    );
 };
 
 export default NavLink;

@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "*.embeddedhtml": "html",
-        "MLTable": "yaml",
-        "plyconfig.json": "jsonc"
-    }
-}

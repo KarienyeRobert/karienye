@@ -1,140 +1,175 @@
 "use client";
+
 import React, { useState } from "react";
-import GithubIcon from "../../../public/github-icon.svg";
-import LinkedinIcon from "../../../public/linkedin-icon.svg";
 import Link from "next/link";
-import Image from "next/image";
+import { motion } from "framer-motion";
+import { Github, Linkedin, Coffee, Mail, Send } from "lucide-react";
 
 const EmailSection = () => {
     const [emailSubmitted, setEmailSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
+
         const data = {
             email: e.target.email.value,
             subject: e.target.subject.value,
             message: e.target.message.value,
         };
-        const JSONdata = JSON.stringify(data);
-        const endpoint = "/api/send";
 
-        // Form the request for sending data to the server.
-        const options = {
-            // The method is POST because we are sending data.
-            method: "POST",
-            // Tell the server we're sending JSON.
-            headers: {
-                "Content-Type": "application/json",
-            },
-            // Body of the request is the JSON data we created above.
-            body: JSONdata,
-        };
+        try {
+            const response = await fetch("/api/send", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
 
-        const response = await fetch(endpoint, options);
-        const resData = await response.json();
-
-        if (response.status === 200) {
-            console.log("Message sent.");
-            setEmailSubmitted(true);
+            if (response.status === 200) {
+                setEmailSubmitted(true);
+                e.target.reset();
+            }
+        } catch (error) {
+            console.error("Error sending email:", error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <section
-            id="contact"
-            className="grid md:grid-cols-2 my-12 md:my-12 py-24 gap-4 relative"
-        >
-            <div className="bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-900 to-transparent rounded-full h-80 w-80 z-0 blur-lg absolute top-3/4 -left-4 transform -translate-x-1/2 -translate-1/2"></div>
-            <div className="z-10">
-                <h5 className="text-xl font-bold text-white my-2">
-                    Let&apos;s Connect
-                </h5>
-                <p className="text-[#ADB7BE] mb-4 max-w-md">
-                    {" "}
-                    I&apos;m currently looking for new opportunities, my inbox is always
-                    open. Whether you have a question or just want to say hi, I&apos;ll
-                    try my best to get back to you!
-                </p>
-                <div className="socials flex flex-row gap-2">
-                    <Link href="https://github.com/KarienyeRobert">
-                        <Image src={GithubIcon} alt="Github Icon"/>
-                    </Link>
-                    <Link href="https://www.linkedin.com/in/robert-karienye-8a4aa1242/">
-                        <Image src={LinkedinIcon} alt="Linkedin Icon"/>
-                    </Link>
-                    <Link href="https://www.buymeacoffee.com/karienye" target="_blank">
-                        <Image
-                        src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png"
-                        alt="Buy Me A Coffee"
-                        height={40}
-                        width={217}
-                        className={"rounded-lg"}
-                        />
-                    </Link>
+        <section id="contact" className="py-16 bg-background relative overflow-hidden">
+            <div className="container mx-auto px-4">
+                <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+                    <motion.div
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="relative z-10"
+                    >
+                        <div className="bg-secondary/30 p-8 rounded-2xl backdrop-blur-sm">
+                            <h2 className="text-3xl font-bold mb-4">Let&apos;s Connect</h2>
+                            <p className="text-muted-foreground mb-6">
+                                I&apos;m currently looking for new opportunities. Whether you have a question
+                                or just want to say hi, I&apos;ll try my best to get back to you!
+                            </p>
+                            <div className="flex gap-4">
+                                <Link
+                                    href="https://github.com/KarienyeRobert"
+                                    target="_blank"
+                                    className="bg-black/50 p-4 rounded-full hover:bg-black/80 transition-colors"
+                                >
+                                    <Github className="w-6 h-6" />
+                                </Link>
+                                <Link
+                                    href="https://www.linkedin.com/in/robert-karienye-8a4aa1242/"
+                                    target="_blank"
+                                    className="bg-blue-700 p-4 rounded-full hover:bg-blue-900 transition-colors"
+                                >
+                                    <Linkedin className="w-6 h-6" />
+                                </Link>
+                                <Link
+                                    href="https://www.buymeacoffee.com/karienye"
+                                    target="_blank"
+                                    className="bg-purple-500 p-4 rounded-full hover:bg-purple-800 transition-colors"
+                                >
+                                    <Coffee className="w-6 h-6" />
+                                </Link>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="relative z-10"
+                    >
+                        {emailSubmitted ? (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="bg-primary/10 p-8 rounded-2xl text-center"
+                            >
+                                <Mail className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                                <h3 className="text-xl text-yellow-600 font-semibold mb-2">Thank you!</h3>
+                                <p className="text-muted-foreground">
+                                    Your message has been sent successfully. I&apos;ll get back to you soon!
+                                </p>
+                            </motion.div>
+                        ) : (
+                            <motion.form
+                                onSubmit={handleSubmit}
+                                className="space-y-6"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                <div>
+                                    <label htmlFor="email" className="block text-sm font-medium mb-2">
+                                        Your Email
+                                    </label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        required
+                                        className="w-full px-4 py-3 rounded-lg bg-gray-900 border border-border focus:border-white focus:ring-1 focus:ring-gray-600 transition-colors"
+                                        placeholder="you@example.com"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                                        Subject
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="subject"
+                                        name="subject"
+                                        required
+                                        className="w-full px-4 py-3 rounded-lg bg-gray-900 border border-border focus:border-white focus:ring-1 focus:ring-gray-600 transition-colors"
+                                        placeholder="What's on your mind?"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="message" className="block text-sm font-medium mb-2">
+                                        Message
+                                    </label>
+                                    <textarea
+                                        id="message"
+                                        name="message"
+                                        required
+                                        rows={4}
+                                        className="w-full px-4 py-3 rounded-lg bg-gray-900 border border-border focus:border-white focus:ring-1 focus:ring-gray-600 transition-colors"
+                                        placeholder="Let's discuss your project..."
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-green-500/40 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+                                >
+                                    {isSubmitting ? (
+                                        "Sending..."
+                                    ) : (
+                                        <>
+                                            Send Message
+                                            <Send className="w-4 h-4" />
+                                        </>
+                                    )}
+                                </button>
+                            </motion.form>
+                        )}
+                    </motion.div>
                 </div>
             </div>
-            <div>
-                {emailSubmitted ? (
-                    <p className="text-green-500 text-sm mt-2">
-                        Email sent successfully!
-                    </p>
-                ) : (
-                    <form className="flex flex-col" onSubmit={handleSubmit}>
-                        <div className="mb-6">
-                            <label
-                                htmlFor="email"
-                                className="text-white block mb-2 text-sm font-medium"
-                            >
-                                Your email
-                            </label>
-                            <input
-                                name="email"
-                                type="email"
-                                id="email"
-                                required
-                                className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
-                                placeholder="jacob@google.com"
-                            />
-                        </div>
-                        <div className="mb-6">
-                            <label
-                                htmlFor="subject"
-                                className="text-white block text-sm mb-2 font-medium"
-                            >
-                                Subject
-                            </label>
-                            <input
-                                name="subject"
-                                type="text"
-                                id="subject"
-                                required
-                                className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
-                                placeholder="Just saying hi"
-                            />
-                        </div>
-                        <div className="mb-6">
-                            <label
-                                htmlFor="message"
-                                className="text-white block text-sm mb-2 font-medium"
-                            >
-                                Message
-                            </label>
-                            <textarea
-                                name="message"
-                                id="message"
-                                className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
-                                placeholder="Let's talk about..."
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="bg-primary-500 hover:bg-primary-600 text-white font-medium py-2.5 px-5 rounded-lg w-full"
-                        >
-                            Send Message
-                        </button>
-                    </form>
-                )}
-            </div>
+
+            {/* Background gradient */}
+            <div className="absolute inset-0 -z-10 bg-gradient-radial from-blue-500/20 via-gray-100 to-gray-100"/>
         </section>
     );
 };
