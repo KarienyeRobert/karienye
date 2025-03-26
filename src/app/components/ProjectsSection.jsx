@@ -24,13 +24,22 @@ const projectsData = [
         tag: ["All", "Web"],
         gitUrl: "https://televerse.vercel.app/",
         previewUrl: "https://televerse.vercel.app/",
+    },
+    {
+        id: 3,
+        title: "AI Flash Cards Website",
+        description: "A simple but efficient learning tool that allows you to generate flashcards using AI technology using Gemini API",
+        image: "/images/flash.png",
+        tag: ["All", "Web"],
+        gitUrl: "https://flash-app-woad.vercel.app/",
+        previewUrl: "https://flash-app-woad.vercel.app/"
     }
 ];
 
 const ProjectsSection = () => {
     const [tag, setTag] = useState("All");
     const ref = useRef(null);
-    const isInView = useInView(ref, { once: true });
+    const isInView = useInView(ref, { once: true, margin: "0px 0px -200px 0px" });
 
     const handleTagChange = (newTag) => {
         setTag(newTag);
@@ -40,73 +49,81 @@ const ProjectsSection = () => {
         project.tag.includes(tag)
     );
 
-    const containerVariants = {
+    const fadeInUp = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.5,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const staggerContainer = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
             transition: {
-                staggerChildren: 0.3,
-            },
-        },
-    };
-
-    const cardVariants = {
-        hidden: { y: 50, opacity: 0 },
-        visible: { y: 0, opacity: 1 },
+                staggerChildren: 0.2,
+                delayChildren: 0.3
+            }
+        }
     };
 
     return (
-        <section id="projects" className="py-16 bg-background">
-            <div className="container mx-auto px-4">
+        <section id="projects" className="py-20 bg-background relative overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
+            
+            <div className="container mx-auto px-4 relative">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="text-center mb-12"
+                    variants={fadeInUp}
+                    initial="hidden"
+                    animate="visible"
+                    className="text-center mb-16"
                 >
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                        <Briefcase className="w-6 h-6 text-primary" />
-                        <h2 className="text-3xl font-bold">My Projects</h2>
+                    <div className="flex items-center justify-center gap-3 mb-6">
+                        <Briefcase className="w-8 h-8 text-primary" />
+                        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+                            My Projects
+                        </h2>
                     </div>
-                    <p className="text-muted-foreground max-w-2xl mx-auto">
+                    <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
                         Explore my portfolio of web and mobile applications, showcasing my expertise
                         in modern technologies and clean, efficient code.
                     </p>
                 </motion.div>
 
-                <div className="flex flex-wrap justify-center items-center gap-3 mb-8">
-                    <ProjectTag
-                        onClick={handleTagChange}
-                        name="All"
-                        isSelected={tag === "All"}
-                    />
-                    <ProjectTag
-                        onClick={handleTagChange}
-                        name="Web"
-                        isSelected={tag === "Web"}
-                    />
-                    <ProjectTag
-                        onClick={handleTagChange}
-                        name="Mobile"
-                        isSelected={tag === "Mobile"}
-                    />
-                </div>
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex flex-wrap justify-center items-center gap-4 mb-12"
+                >
+                    {["All", "Web", "Mobile"].map((tagName) => (
+                        <ProjectTag
+                            key={tagName}
+                            onClick={handleTagChange}
+                            name={tagName}
+                            isSelected={tag === tagName}
+                        />
+                    ))}
+                </motion.div>
 
                 <motion.div
                     ref={ref}
-                    variants={containerVariants}
+                    variants={staggerContainer}
                     initial="hidden"
                     animate={isInView ? "visible" : "hidden"}
-                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
                 >
-                    {filteredProjects.map((project, index) => (
+                    {filteredProjects.map((project) => (
                         <motion.div
                             key={project.id}
-                            variants={cardVariants}
-                            transition={{
-                                duration: 0.5,
-                                ease: "easeOut",
-                            }}
+                            variants={fadeInUp}
+                            className="h-full"
                         >
                             <ProjectCard
                                 title={project.title}
@@ -118,6 +135,18 @@ const ProjectsSection = () => {
                         </motion.div>
                     ))}
                 </motion.div>
+
+                {filteredProjects.length === 0 && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center py-20"
+                    >
+                        <p className="text-muted-foreground text-lg">
+                            No projects found for this category.
+                        </p>
+                    </motion.div>
+                )}
             </div>
         </section>
     );

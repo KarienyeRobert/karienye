@@ -4,31 +4,52 @@ import Link from "next/link";
 
 const ProjectCard = ({ imgUrl, title, description, gitUrl, previewUrl }) => {
   return (
-      <div>
-        <div
-            className="h-52 md:h-72 rounded-t-xl relative group"
-            style={{ background: `url(${imgUrl})`, backgroundSize: "cover" }}
-        >
-          <div className="overlay items-center justify-center absolute top-0 left-0 w-full h-full bg-[#181818] bg-opacity-0 hidden group-hover:flex group-hover:bg-opacity-80 transition-all duration-500 ">
-            <Link
+    <div className="group rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl">
+      <div
+        className="h-52 md:h-72 relative"
+        style={{
+          background: `url(${imgUrl})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* Overlay with improved animation */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+            <div className="flex gap-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+              <Link
                 href={gitUrl}
-                className="h-14 w-14 mr-2 border-2 relative rounded-full border-[#ADB7BE] hover:border-white group/link"
-            >
-              <CodeBracketIcon className="h-10 w-10 text-[#ADB7BE] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  cursor-pointer group-hover/link:text-white" />
-            </Link>
-            <Link
+                className="h-14 w-14 relative rounded-full border-2 border-[#ADB7BE] hover:border-white transition-colors duration-300 group/link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <CodeBracketIcon className="h-8 w-8 text-[#ADB7BE] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 group-hover/link:text-white transition-colors duration-300" />
+                <span className="sr-only">View Source Code</span>
+              </Link>
+              <Link
                 href={previewUrl}
-                className="h-14 w-14 border-2 relative rounded-full border-[#ADB7BE] hover:border-white group/link"
-            >
-              <EyeIcon className="h-10 w-10 text-[#ADB7BE] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  cursor-pointer group-hover/link:text-white" />
-            </Link>
+                className="h-14 w-14 relative rounded-full border-2 border-[#ADB7BE] hover:border-white transition-colors duration-300 group/link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <EyeIcon className="h-8 w-8 text-[#ADB7BE] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 group-hover/link:text-white transition-colors duration-300" />
+                <span className="sr-only">View Live Preview</span>
+              </Link>
+            </div>
           </div>
         </div>
-        <div className="text-white rounded-b-xl mt-3 bg-[#181818]py-6 px-4">
-          <h5 className="text-xl font-semibold mb-2">{title}</h5>
-          <p className="text-[#ADB7BE]">{description}</p>
-        </div>
       </div>
+
+      {/* Content section with improved spacing and animations */}
+      <div className="bg-[#181818] p-6 transform transition-transform duration-300">
+        <h5 className="text-xl font-semibold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300">
+          {title}
+        </h5>
+        <p className="text-[#ADB7BE] text-sm leading-relaxed">
+          {description}
+        </p>
+      </div>
+    </div>
   );
 };
 
