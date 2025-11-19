@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
 const fromEmail = process.env.FROM_EMAIL; // Your verified email address
@@ -7,15 +7,22 @@ const smtpPort = process.env.SMTP_PORT; // SMTP port (e.g., 587)
 const smtpUser = process.env.SMTP_USER; // SMTP user (email for login)
 const smtpPass = process.env.SMTP_PASS; // SMTP password or app-specific password
 
-export async function POST(req, res) {
-    const { email, subject, message } = await req.json();
-
+export async function POST(req: NextRequest) {
     try {
+        const { email, subject, message } = await req.json();
+
+        if (!email || !subject || !message) {
+            return NextResponse.json(
+                { error: "Missing required fields" },
+                { status: 400 }
+            );
+        }
+
         // Create a transporter for Nodemailer
         const transporter = nodemailer.createTransport({
             host: smtpHost,
-            port: smtpPort,
-            secure: smtpPort === 465,
+            port: Number(smtpPort),
+            secure: smtpPort === "465",
             auth: {
                 user: smtpUser,
                 pass: smtpPass,
@@ -42,7 +49,6 @@ export async function POST(req, res) {
         </footer>
     </div>
 `,
-
         });
 
         const confirmationEmail = await transporter.sendMail({
@@ -54,7 +60,7 @@ export async function POST(req, res) {
         <div style="background-color: #f9f9fc; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
             <h1 style="color: #444; font-size: 24px; margin-bottom: 10px;">Thank you for reaching out!</h1>
             <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
-                We’ve received your message, and our team will review it shortly and get back to you.
+                We've received your message, and our team will review it shortly and get back to you.
             </p>
             <div style="background: #fefefe; padding: 15px; border-left: 4px solid #4caf50; margin-bottom: 20px; border-radius: 5px;">
                 <blockquote style="margin: 0; font-size: 16px; color: #666;">
@@ -62,7 +68,7 @@ export async function POST(req, res) {
                 </blockquote>
             </div>
             <p style="font-size: 16px; margin-bottom: 20px;">
-                If you need to follow up, please don’t hesitate to reply to this email.
+                If you need to follow up, please don't hesitate to reply to this email.
             </p>
             <p style="font-size: 16px;">Best regards,</p>
             <br>
@@ -73,13 +79,16 @@ export async function POST(req, res) {
         </footer>
     </div>
 `,
-
         });
 
         // Return a success response
-        return NextResponse.json({ adminEmail, confirmationEmail });
+        return NextResponse.json({ adminEmail, confirmationEmail }, { status: 200 });
     } catch (error) {
         console.error("Error sending email:", error);
-        return NextResponse.json({ error: error.message });
+        return NextResponse.json(
+            { error: error instanceof Error ? error.message : "Failed to send email" },
+            { status: 500 }
+        );
     }
 }
+
